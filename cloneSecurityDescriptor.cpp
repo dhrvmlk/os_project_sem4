@@ -1,13 +1,17 @@
 #include <iostream>
 #include <windows.h>
 #include <string>
+#include "securityDescriptors.hpp"
 using namespace std;
 
 bool cloneSecurityDescriptor(const wchar_t *filePath, const wchar_t *clonePath)
 {
-    SECURITY_INFORMATION secInfo = OWNER_SECURITY_INFORMATION | GROUP_SECURITY_INFORMATION | DACL_SECURITY_INFORMATION;
+    SECURITY_INFORMATION secInfo = OWNER_SECURITY_INFORMATION |
+                                   GROUP_SECURITY_INFORMATION | DACL_SECURITY_INFORMATION;
 
-    HANDLE hFile = CreateFileW(filePath, READ_CONTROL, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+    HANDLE hFile = CreateFileW(filePath, READ_CONTROL, FILE_SHARE_READ, NULL,
+                               OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+
     if (hFile == INVALID_HANDLE_VALUE)
     {
         wcout << L"Failed to open the file: " << filePath << L"\n";
@@ -42,7 +46,9 @@ bool cloneSecurityDescriptor(const wchar_t *filePath, const wchar_t *clonePath)
         return false;
     }
 
-    HANDLE hBackup = CreateFileW(clonePath, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+    HANDLE hBackup = CreateFileW(clonePath, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS,
+                                 FILE_ATTRIBUTE_NORMAL, NULL);
+
     if (hBackup == INVALID_HANDLE_VALUE)
     {
         wcout << L"Failed to create backup file: " << clonePath << L"\n";
