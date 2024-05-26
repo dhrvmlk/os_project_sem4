@@ -159,3 +159,37 @@ void ACL::DenyPermission()
     // Print success message
     std::cout << "Permission denied successfully!" << std::endl;
 }
+
+// Function to reset permissions to default
+void ACL::ResetPermissions()
+{
+    // Get file/folder path from user
+    std::cout << "Enter the file or folder path: ";
+    std::cin.ignore();
+    std::getline(std::cin, filename);
+    // Construct command for icacls and execute it using popen
+    std::string command = "icacls \"" + filename + "\" /reset";
+    FILE *pipe = popen(command.c_str(), "r");
+    if (!pipe)
+    {
+        // Throw an exception if command execution fails
+        throw std::runtime_error("Error executing icacls command");
+    }
+
+    // Read command output and print it to console
+    while (fgets(buffer, 128, pipe))
+    {
+        std::cout << buffer;
+    }
+
+    // Close the pipe and check the status
+    int result = pclose(pipe);
+    if (result != 0)
+    {
+        // Throw an exception if command execution fails
+        throw std::runtime_error("icacls command failed with error code " + std::to_string(result));
+    }
+
+    // Print success message
+    std::cout << "Permissions reset successfully!" << std::endl;
+}
