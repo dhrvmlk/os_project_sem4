@@ -193,3 +193,81 @@ void ACL::ResetPermissions()
     // Print success message
     std::cout << "Permissions reset successfully!" << std::endl;
 }
+
+void ACL::DisableInheritance()
+{
+    // Get file/folder path from user
+    std::cout << "Enter the file or folder path: ";
+    std::string path;
+    std::getline(std::cin >> std::ws, path);
+
+    // Construct command to check inheritance status and execute it using popen
+    std::string checkCommand = "icacls \"" + path + "\"";
+    FILE *checkPipe = popen(checkCommand.c_str(), "r");
+    if (!checkPipe)
+    {
+        throw std::runtime_error("Error executing icacls command");
+    }
+
+    // Read command output and check if inheritance is enabled or disabled
+    std::string checkOutput;
+    char checkBuffer[128];
+    while (fgets(checkBuffer, 128, checkPipe))
+    {
+        checkOutput += checkBuffer;
+    }
+    bool inheritanceEnabled = checkOutput.find("(OI)(CI)(IO)") != std::string::npos;
+
+    // Close the check pipe and check the status
+    int checkResult = pclose(checkPipe);
+    if (checkResult != 0)
+    {
+        throw std::runtime_error("icacls command failed with error code " + std::to_string(checkResult));
+    }
+
+    // Display current inheritance status and prompt user to enable or disable it
+    std::cout << "Current inheritance status: " << (inheritanceEnabled ? "Enabled" : "Disabled") << std::endl;
+    std::cout << "Do you want to enable or disable inheritance? (e/d): ";
+    char choice;
+    std::cin >> choice;
+
+    // Construct command to enable/disable inheritance and execute it using popen
+    std::string command;
+    switch (choice)
+    {
+    case 'e':
+    case 'E':
+        command = "icacls \"" + path + "\" /inheritance:e";
+        break;
+    case 'd':
+    case 'D':
+        command = "icacls \"" + path + "\" /inheritance:d";
+        break;
+    default:
+        std::cout << "Invalid choice" << std::endl;
+        return;
+    }
+    FILE *pipe = popen(command.c_str(), "r");
+    if (!pipe)
+    {
+        throw std::runtime_error("Error executing icacls command");
+    }
+
+    // Read command output and print it to console
+    char buffer[128];
+    while (fgets(buffer, 128, pipe))
+    {
+        std::cout << buffer;
+    }
+
+    // Close the pipe and check the status
+    int result = pclose(pipe);
+    if (result != 0)
+    {
+        throw std::runtime_error("icacls command failed with error code " + std::to_string(result));
+    }
+
+    // Print success message
+    std::cout << "Permissions inheritance " << (choice == 'd' || choice == 'D' ? "disabled" : "enabled")
+              << " successfully!" << std::endl;
+}
