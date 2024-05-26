@@ -5,7 +5,7 @@
 #include "aclBase.hpp"
 
 // Implementation class for ACL operations
-class ACL : public ACLBase
+class ACL_impl : public ACLBase
 {
 public:
     std::string ReadACL() override;

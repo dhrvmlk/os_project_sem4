@@ -3,7 +3,7 @@
 #include "acl.hpp"
 
 // Function to read ACL
-std::string ACL::ReadACL()
+std::string ACL_impl::ReadACL()
 {
     // Get file path from user
     std::cout << "Enter the file path: ";
@@ -12,7 +12,7 @@ std::string ACL::ReadACL()
 
     // Construct command for icacls and execute it using popen
     std::string command = "icacls \"" + filename + "\"";
-    FILE *pipe = popen(command.c_str(), "r");
+    FILE *pipe = fopen(command.c_str(), "r");
     if (!pipe)
     {
         // Throw an exception if command execution fails
@@ -27,7 +27,7 @@ std::string ACL::ReadACL()
     }
 
     // Close pipe and check the status
-    int status = pclose(pipe);
+    int status = fclose(pipe);
     if (status != 0)
     {
         // Throw an exception if command execution fails
@@ -40,7 +40,7 @@ std::string ACL::ReadACL()
 }
 
 // Function to grant permission
-void ACL::GrantPermission()
+void ACL_impl::GrantPermission()
 {
     // Get file/folder path, username, and permission type from user
     std::cout << "Enter the file or folder path: ";
@@ -55,7 +55,7 @@ void ACL::GrantPermission()
 
     // Construct command for icacls and execute it using popen
     std::string command = "icacls \"" + filename + "\" /grant \"" + username + "\":" + permission;
-    FILE *pipe = popen(command.c_str(), "r");
+    FILE *pipe = fopen(command.c_str(), "r");
     if (!pipe)
     {
         // Throw an exception if command execution fails
@@ -69,7 +69,7 @@ void ACL::GrantPermission()
     }
 
     // Close the pipe and check the status
-    int result = pclose(pipe);
+    int result = fclose(pipe);
     if (result != 0)
     {
         // Throw an exception if command execution fails
@@ -81,7 +81,7 @@ void ACL::GrantPermission()
 }
 
 // Function to remove permission
-void ACL::RemovePermission()
+void ACL_impl::RemovePermission()
 {
     // Get file/folder path, username, and permission type from user
     std::cout << "Enter the file or folder path: ";
@@ -95,7 +95,7 @@ void ACL::RemovePermission()
 
     // Construct command for icacls and execute it using popen
     std::string command = "icacls \"" + filename + "\" /remove \"" + username + "\":" + permission;
-    FILE *pipe = popen(command.c_str(), "r");
+    FILE *pipe = fopen(command.c_str(), "r");
     if (!pipe)
     {
         // Throw an exception if command execution fails
@@ -109,7 +109,7 @@ void ACL::RemovePermission()
     }
 
     // Close the pipe and check the status
-    int result = pclose(pipe);
+    int result = fclose(pipe);
     if (result != 0)
     {
         // Throw an exception if command execution fails
@@ -121,7 +121,7 @@ void ACL::RemovePermission()
 }
 
 // Function to deny permission
-void ACL::DenyPermission()
+void ACL_impl::DenyPermission()
 {
     // Get file/folder path, username, and permission type from user
     std::cout << "Enter the file or folder path: ";
@@ -135,7 +135,7 @@ void ACL::DenyPermission()
 
     // Construct command for icacls and execute it using popen
     std::string command = "icacls \"" + filename + "\" /deny \"" + username + "\":" + permission;
-    FILE *pipe = popen(command.c_str(), "r");
+    FILE *pipe = fopen(command.c_str(), "r");
     if (!pipe)
     {
         // Throw an exception if command execution fails
@@ -149,7 +149,7 @@ void ACL::DenyPermission()
     }
 
     // Close the pipe and check the status
-    int result = pclose(pipe);
+    int result = fclose(pipe);
     if (result != 0)
     {
         // Throw an exception if command execution fails
@@ -161,7 +161,7 @@ void ACL::DenyPermission()
 }
 
 // Function to reset permissions to default
-void ACL::ResetPermissions()
+void ACL_impl::ResetPermissions()
 {
     // Get file/folder path from user
     std::cout << "Enter the file or folder path: ";
@@ -169,7 +169,7 @@ void ACL::ResetPermissions()
     std::getline(std::cin, filename);
     // Construct command for icacls and execute it using popen
     std::string command = "icacls \"" + filename + "\" /reset";
-    FILE *pipe = popen(command.c_str(), "r");
+    FILE *pipe = fopen(command.c_str(), "r");
     if (!pipe)
     {
         // Throw an exception if command execution fails
@@ -183,7 +183,7 @@ void ACL::ResetPermissions()
     }
 
     // Close the pipe and check the status
-    int result = pclose(pipe);
+    int result = fclose(pipe);
     if (result != 0)
     {
         // Throw an exception if command execution fails
@@ -194,7 +194,7 @@ void ACL::ResetPermissions()
     std::cout << "Permissions reset successfully!" << std::endl;
 }
 
-void ACL::DisableInheritance()
+void ACL_impl::DisableInheritance()
 {
     // Get file/folder path from user
     std::cout << "Enter the file or folder path: ";
@@ -203,7 +203,7 @@ void ACL::DisableInheritance()
 
     // Construct command to check inheritance status and execute it using popen
     std::string checkCommand = "icacls \"" + path + "\"";
-    FILE *checkPipe = popen(checkCommand.c_str(), "r");
+    FILE *checkPipe = fopen(checkCommand.c_str(), "r");
     if (!checkPipe)
     {
         throw std::runtime_error("Error executing icacls command");
@@ -219,7 +219,7 @@ void ACL::DisableInheritance()
     bool inheritanceEnabled = checkOutput.find("(OI)(CI)(IO)") != std::string::npos;
 
     // Close the check pipe and check the status
-    int checkResult = pclose(checkPipe);
+    int checkResult = fclose(checkPipe);
     if (checkResult != 0)
     {
         throw std::runtime_error("icacls command failed with error code " + std::to_string(checkResult));
@@ -247,7 +247,7 @@ void ACL::DisableInheritance()
         std::cout << "Invalid choice" << std::endl;
         return;
     }
-    FILE *pipe = popen(command.c_str(), "r");
+    FILE *pipe = fopen(command.c_str(), "r");
     if (!pipe)
     {
         throw std::runtime_error("Error executing icacls command");
@@ -261,7 +261,7 @@ void ACL::DisableInheritance()
     }
 
     // Close the pipe and check the status
-    int result = pclose(pipe);
+    int result = fclose(pipe);
     if (result != 0)
     {
         throw std::runtime_error("icacls command failed with error code " + std::to_string(result));
