@@ -8,18 +8,21 @@ void getInfo()
     wstring path;
     wstring backupPath;
 
+    // Prompt the user to select an option
+    cout << "\nManage File permissions:\n";
+    cout << "1) Backup file permissions\n";
+    cout << "2) Restore file permissions from backup\n";
+
+    int option;
+    cout << "Enter your choice here: ";
+    cin >> option;
+
     // Prompt the user to enter the path and backup path
     cout << "Enter the file path: ";
+    wcin.ignore();
     getline(wcin, path);
     cout << "Enter the backup file path: ";
     getline(wcin, backupPath);
-
-    // Prompt the user to select an option
-    cout << "Select an option:\n";
-    cout << "1. Backup file permissions\n";
-    cout << "2. Restore file permissions from backup\n";
-    int option;
-    cin >> option;
 
     bool success = false;
 
